@@ -1,19 +1,23 @@
 name: NBA_Auto_Update
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: # 支持手动点击运行
   schedule:
-    - cron: '0 22 * * *' # 每天早上6点(北京时间)自动运行
+    - cron: '0 22 * * *' # 每天北京时间早上6点自动运行
 
 jobs:
   run_script:
     runs-on: ubuntu-latest
+    # 必须开启写入权限，否则文件存不回仓库
+    permissions:
+      contents: write
+      
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.9'
 
