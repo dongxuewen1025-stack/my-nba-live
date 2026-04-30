@@ -1,36 +1,20 @@
 import requests
 import time
 
-def check_stream(url, headers, timeout=8):
-    """验证流地址是否真的能连通"""
-    try:
-        r = requests.head(url, headers=headers, timeout=timeout, allow_redirects=True)
-        if r.status_code < 400:
-            return True
-        # HEAD 不支持的服务器，用 GET 只取头部
-        r = requests.get(url, headers=headers, timeout=timeout, stream=True)
-        r.close()
-        return r.status_code < 400
-    except:
-        return False
-
 def filter_nba_channels():
     sources = [
+        # 国内维护、稳定更新的综合源
         "https://live.fanmingming.com/tv/m3u/ipv6.m3u",
         "https://raw.githubusercontent.com/YueChan/Live/main/IPTV.m3u",
         "https://raw.githubusercontent.com/YanG-1989/m3u/main/Gather.m3u",
-        "https://raw.githubusercontent.com/ymyuuu/IPTVLIST/main/BestTV.m3u",
-        "https://raw.githubusercontent.com/Ftindy/IPTV-URL/main/bestiptv.m3u",
         "https://raw.githubusercontent.com/vbskycn/iptv/master/tv/iptv4.m3u",
-        "https://raw.githubusercontent.com/xiaoz-cn/iptv/main/iptv.m3u",
-        "https://raw.githubusercontent.com/loveminimal/iptv-cn/main/channels.m3u",
-        "https://iptv-org.github.io/iptv/countries/tw.m3u",
-        "https://raw.githubusercontent.com/iptv-org/iptv/master/streams/tw.m3u",
+        "https://raw.githubusercontent.com/Ftindy/IPTV-URL/main/bestiptv.m3u",
+        "https://raw.githubusercontent.com/ymyuuu/IPTVLIST/main/BestTV.m3u",
+        # 专注港台的源
         "https://raw.githubusercontent.com/Moezx/tv/main/Taiwan.m3u",
-        "https://iptv-org.github.io/iptv/countries/cn.m3u",
-        "https://raw.githubusercontent.com/iptv-org/iptv/master/streams/cn.m3u",
-        "https://iptv-org.github.io/iptv/countries/hk.m3u",
+        "https://raw.githubusercontent.com/iptv-org/iptv/master/streams/tw.m3u",
         "https://raw.githubusercontent.com/iptv-org/iptv/master/streams/hk.m3u",
+        "https://raw.githubusercontent.com/iptv-org/iptv/master/streams/cn.m3u",
     ]
 
     keywords = [
@@ -40,6 +24,8 @@ def filter_nba_channels():
         "爱尔达", "愛爾達", "ELTA",
         "广东体育", "廣東體育", "广体",
         "五星体育", "五星體育",
+        "精品体育", "精品體育",
+        "安徽体育", "安徽體育",
         "体育", "體育", "Sports",
     ]
 
@@ -50,12 +36,11 @@ def filter_nba_channels():
     new_m3u = ["#EXTM3U"]
     added_links = set()
     count = 0
-    dead_count = 0
 
     for source_url in sources:
         for attempt in range(2):
             try:
-                print(f"正在抓取: {source_url[:55]}...")
+                print(f"正在抓取: {source_url[:60]}...")
                 r = requests.get(source_url, headers=headers, timeout=25)
                 r.raise_for_status()
                 r.encoding = 'utf-8'
@@ -71,17 +56,11 @@ def filter_nba_channels():
                             link = lines[j].strip()
                             if link.startswith("http") and link not in added_links:
                                 channel_name = line.split(",")[-1].strip()
-                                # ✅ 验证链接是否真的能播
-                                print(f"  🔍 验证: {channel_name} ...")
-                                if check_stream(link, headers):
-                                    new_m3u.append(line)
-                                    new_m3u.append(link)
-                                    added_links.add(link)
-                                    print(f"  ✅ 有效: {channel_name}")
-                                    count += 1
-                                else:
-                                    print(f"  💀 死链，丢弃: {channel_name}")
-                                    dead_count += 1
+                                new_m3u.append(line)
+                                new_m3u.append(link)
+                                added_links.add(link)
+                                print(f"  ✅ {channel_name}")
+                                count += 1
                                 break
                     i += 1
                 break
@@ -96,7 +75,7 @@ def filter_nba_channels():
     with open("my_nba_list.m3u", "w", encoding="utf-8") as f:
         f.write("\n".join(new_m3u))
 
-    print(f"\n🚀 完成！有效频道 {count} 个，丢弃死链 {dead_count} 个。")
+    print(f"\n🚀 完成！共整合 {count} 个体育频道。")
 
 if __name__ == "__main__":
     filter_nba_channels()
