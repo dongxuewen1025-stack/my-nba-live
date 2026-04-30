@@ -15,7 +15,7 @@ def filter_sports_channels():
         # 遍历每一行，寻找关键词
         for i in range(len(lines)):
             # 这里你可以自定义关键词，比如想要“NBA”、“体育”或“CCTV-5”
-            if any(word in lines[i] for word in ["CCTV-5", "体育", "NBA", "赛事"]):
+            if "#EXTINF" in lines[i]:
                 # 发现关键词后，把当前行（描述行）和下一行（链接行）都加入新列表
                 if i + 1 < len(lines) and lines[i+1].startswith("http"):
                     new_m3u.append(lines[i])
