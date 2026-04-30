@@ -1,13 +1,20 @@
 import requests
 import time
+import re
 
-# 只接受这些真正的视频流格式
-VALID_EXTENSIONS = ('.m3u8', '.ts', '.flv', '.mp4', '.rmvb', '.mkv')
+VALID_EXTENSIONS = ('.m3u8', '.ts', '.flv', '.mp4')
 
 def is_real_stream(url):
-    """过滤掉 HTML 页面伪装的假流地址"""
-    url_lower = url.lower().split('?')[0]  # 去掉参数再判断
+    url_lower = url.lower().split('?')[0]
     return any(url_lower.endswith(ext) for ext in VALID_EXTENSIONS)
+
+def normalize_extinf(line, channel_name):
+    """强制把所有频道归到同一个 group-title，方便 app 统一显示"""
+    # 去掉原有 group-title
+    line = re.sub(r'group-title="[^"]*"', '', line)
+    # 统一注入 group-title="体育"
+    line = line.replace('#EXTINF:-1', '#EXTINF:-1 group-title="体育"')
+    return line
 
 def filter_nba_channels():
     sources = [
@@ -33,6 +40,12 @@ def filter_nba_channels():
         "精品体育", "精品體育",
         "安徽体育", "安徽體育",
         "体育", "體育", "Sports",
+    ]
+
+    # 这些域名已知返回 HTML 广告页，不管后缀是什么都丢掉
+    FAKE_DOMAINS = [
+        "spread.3yl.xyz",
+        "3yl.xyz",
     ]
 
     headers = {
@@ -63,14 +76,19 @@ def filter_nba_channels():
                             link = lines[j].strip()
                             if link.startswith("http") and link not in added_links:
                                 channel_name = line.split(",")[-1].strip()
-                                if is_real_stream(link):
-                                    new_m3u.append(line)
+
+                                # 过滤假域名
+                                is_fake_domain = any(d in link for d in FAKE_DOMAINS)
+                                # 过滤非流地址
+                                if is_real_stream(link) and not is_fake_domain:
+                                    clean_line = normalize_extinf(line, channel_name)
+                                    new_m3u.append(clean_line)
                                     new_m3u.append(link)
                                     added_links.add(link)
-                                    print(f"  ✅ {channel_name}  ({link[-30:]})")
+                                    print(f"  ✅ {channel_name}  ({link[-35:]})")
                                     count += 1
                                 else:
-                                    print(f"  🚫 假流地址，丢弃: {channel_name}  ({link[-30:]})")
+                                    print(f"  🚫 丢弃: {channel_name}")
                                     fake_count += 1
                                 break
                     i += 1
