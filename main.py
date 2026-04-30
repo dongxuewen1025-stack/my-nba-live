@@ -1,16 +1,22 @@
 import requests
 import time
 
+# 只接受这些真正的视频流格式
+VALID_EXTENSIONS = ('.m3u8', '.ts', '.flv', '.mp4', '.rmvb', '.mkv')
+
+def is_real_stream(url):
+    """过滤掉 HTML 页面伪装的假流地址"""
+    url_lower = url.lower().split('?')[0]  # 去掉参数再判断
+    return any(url_lower.endswith(ext) for ext in VALID_EXTENSIONS)
+
 def filter_nba_channels():
     sources = [
-        # 国内维护、稳定更新的综合源
         "https://live.fanmingming.com/tv/m3u/ipv6.m3u",
         "https://raw.githubusercontent.com/YueChan/Live/main/IPTV.m3u",
         "https://raw.githubusercontent.com/YanG-1989/m3u/main/Gather.m3u",
         "https://raw.githubusercontent.com/vbskycn/iptv/master/tv/iptv4.m3u",
         "https://raw.githubusercontent.com/Ftindy/IPTV-URL/main/bestiptv.m3u",
         "https://raw.githubusercontent.com/ymyuuu/IPTVLIST/main/BestTV.m3u",
-        # 专注港台的源
         "https://raw.githubusercontent.com/Moezx/tv/main/Taiwan.m3u",
         "https://raw.githubusercontent.com/iptv-org/iptv/master/streams/tw.m3u",
         "https://raw.githubusercontent.com/iptv-org/iptv/master/streams/hk.m3u",
@@ -36,6 +42,7 @@ def filter_nba_channels():
     new_m3u = ["#EXTM3U"]
     added_links = set()
     count = 0
+    fake_count = 0
 
     for source_url in sources:
         for attempt in range(2):
@@ -56,11 +63,15 @@ def filter_nba_channels():
                             link = lines[j].strip()
                             if link.startswith("http") and link not in added_links:
                                 channel_name = line.split(",")[-1].strip()
-                                new_m3u.append(line)
-                                new_m3u.append(link)
-                                added_links.add(link)
-                                print(f"  ✅ {channel_name}")
-                                count += 1
+                                if is_real_stream(link):
+                                    new_m3u.append(line)
+                                    new_m3u.append(link)
+                                    added_links.add(link)
+                                    print(f"  ✅ {channel_name}  ({link[-30:]})")
+                                    count += 1
+                                else:
+                                    print(f"  🚫 假流地址，丢弃: {channel_name}  ({link[-30:]})")
+                                    fake_count += 1
                                 break
                     i += 1
                 break
@@ -75,7 +86,7 @@ def filter_nba_channels():
     with open("my_nba_list.m3u", "w", encoding="utf-8") as f:
         f.write("\n".join(new_m3u))
 
-    print(f"\n🚀 完成！共整合 {count} 个体育频道。")
+    print(f"\n🚀 完成！真实流 {count} 个，丢弃假地址 {fake_count} 个。")
 
 if __name__ == "__main__":
     filter_nba_channels()
