@@ -1,0 +1,5 @@
+#EXTM3U
+#EXTINF:-1 group-title="NBA", CCTV-5 体育 (测试)
+http://ivi.bupt.edu.cn/hls/cctv5hd.m3u8
+#EXTINF:-1 group-title="NBA", 备用 NBA 测试源
+https://pili-live-hdl.vcinema.cn/vcinema/nba_stream.m3u8
