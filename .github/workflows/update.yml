@@ -1,14 +1,14 @@
 name: NBA_Auto_Update
 
 on:
-  workflow_dispatch: # 支持手动点击运行
+  workflow_dispatch: 
   schedule:
-    - cron: '0 22 * * *' # 每天北京时间早上6点自动运行
+    - cron: '0 22 * * *' # 北京时间早上6点自动运行
 
 jobs:
   run_script:
     runs-on: ubuntu-latest
-    # 必须开启写入权限，否则文件存不回仓库
+    # 必须开启写入权限
     permissions:
       contents: write
       
