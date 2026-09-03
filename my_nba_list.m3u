@@ -79,8 +79,8 @@ http://gslbserv.itv.cmvideo.cn/index.m3u8?channel-id=FifastbLive&Contentid=30000
 http://gslbserv.itv.cmvideo.cn/index.m3u8?channel-id=FifastbLive&Contentid=3000000020000011521&livemode=1&stbId=YanG-1989
 #EXTINF:-1 group-title="体育" tvg-id="咪咕体育" tvg-name="咪咕体育" tvg-logo="https://material.1989.click/logo/咪咕.png" ,咪咕直播 𝟛𝟞「移动」
 http://gslbserv.itv.cmvideo.cn/index.m3u8?channel-id=FifastbLive&Contentid=3000000020000011522&livemode=1&stbId=YanG-1989
-#EXTINF:-1 group-title="体育" tvg-name="CCTV5" tvg-id="27" tvg-logo="https://tb.zbds.top/logo/CCTV5.png" , CCTV5
-http://gmxw.7766.org:808/hls/93/index.m3u8
+#EXTINF:-1 group-title="体育" tvg-name="CCTV5" tvg-id="CCTV-5" tvg-logo="https://tb.zbds.top/logo/CCTV5.png" , CCTV5
+http://112.30.73.119:9901/tsfile/live/0005_2.m3u8?key=txiptv&playlive=0&authid=0
 #EXTINF:-1 group-title="体育" tvg-name="CCTV5+" tvg-id="CCTV-5+" tvg-logo="https://tb.zbds.top/logo/CCTV5+.png" , CCTV5+
 https://myip.pdtvhd.com/Sports/streams/CCTV5pul.m3u8
 #EXTINF:-1 group-title="体育" tvg-name="精品体育" tvg-id="NewTV精品体育" tvg-logo="https://tb.zbds.top/logo/精品体育.png" , 精品体育
